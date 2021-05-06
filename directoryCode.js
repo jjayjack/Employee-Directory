@@ -33,6 +33,7 @@ const findDept = () => {
                 'Add Department',
                 'Add Role',
                 'Edit Role',
+                'Edit Manager',
                 'Exit'
             ],
         })
@@ -64,7 +65,11 @@ const findDept = () => {
                 
                 case 'Edit Role':
                     editRole();
-                    break;                
+                    break;     
+                
+                case 'Edit Manager':
+                    editManager();
+                    break;
 
                 case 'Exit':
                     process.exit();
@@ -270,5 +275,34 @@ const editRole = () => {
                     })
                 })
         })
+    })
+}
+
+const editManager = () => {
+    const query = `SELECT concat(first_name, ' ', last_name) AS name, id AS value FROM employee`;
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        inquirer
+            .prompt([
+                {
+                    name: 'first_name',
+                    type: 'rawlist',
+                    message: 'Which employee would you like to update?',
+                    choices: res
+                },
+                {
+                    name: 'manager_id',
+                    type: 'rawlist',
+                    message: 'Who is the manager of the employee',
+                    choices: res
+                }
+            ])
+            .then((response) => {
+                const query3 = `UPDATE employee SET manager_id = ${response.manager_id} WHERE id = ${response.first_name}`
+                connection.query(query3, (err3, res3) => {
+                    if (err3) throw err3;
+                    findDept();
+                })
+            })
     })
 }
