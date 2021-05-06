@@ -1,0 +1,27 @@
+{
+  "name": "Employee-Directory",
+  "version": "1.0.0",
+  "description": "Welcome to the landing page for this employee-directory application! Within this coding, users will utilize the command prompt to view and delete employees, departments and roles within a company.",
+  "main": "directoryCode.js",
+  "dependencies": {
+    "console.table": "^0.10.0",
+    "inquirer": "^8.0.0",
+    "mysql": "^2.18.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node directoryCode.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jjayjack/Employee-Directory.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jjayjack/Employee-Directory/issues"
+  },
+  "homepage": "https://github.com/jjayjack/Employee-Directory#readme"
+}

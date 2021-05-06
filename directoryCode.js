@@ -32,6 +32,7 @@ const findDept = () => {
                 'Add Employee',
                 'Add Department',
                 'Add Role',
+                'Exit'
             ],
         })
         .then((answer) => {
@@ -60,6 +61,9 @@ const findDept = () => {
                     addRole();
                     break;
 
+                case 'Exit':
+                    process.exit();
+
                 default:
                     console.log(`Invalid action: ${answer.action}`);
                     break;
@@ -68,40 +72,75 @@ const findDept = () => {
 };
 
 const empView = () => {
-    const query = 'SELECT * FROM employee';
+    const query = 'SELECT role.title AS role, m.first_name AS managerFirstName, e.id, e.first_name, e.last_name FROM employee AS e LEFT JOIN role ON e.role_id = role.id LEFT JOIN employee AS m ON e.manager_id = m.id';
     connection.query(query, (err, res) => {
         if (err) throw err;
-        table(
-            `id: ${employee.id} || First Name: ${employee.first_name} || Last Name: ${employee.last_name} || Role: ${employee.role_id} || Manager: ${employee.manager_id}`
-        )
+        res.forEach((employee) => {
+            console.log(
+                `id: ${employee.id} || First Name: ${employee.first_name} || Last Name: ${employee.last_name} || Role: ${employee.role} || Manager: ${employee.managerFirstName}`
+            )
+        });
         findDept();
     })
 };
 
 const deptSearch = () => {
-    inquirer
-        .prompt({
-            name: 'department',
-            type: 'rawlist',
-            message: 'What department would you like to view?',
-            choices: ['Production', 'R&D', 'Purchasing', 'Marketing', 'HR', 'Accounting & Finance']
-        })
-        
-};
+    const tableDept = 'SELECT name, id AS value FROM department';
+    connection.query(tableDept, (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt({
+                name: 'department',
+                type: 'rawlist',
+                message: 'What department would you like to view?',
+                choices: res
+            })
+            .then((response) => {
+                const query = `SELECT role.title AS role, m.first_name AS managerFirstName, e.id, e.first_name, e.last_name FROM employee AS e LEFT JOIN role ON e.role_id = role.id LEFT JOIN department AS d ON role.department_id = d.id LEFT JOIN employee AS m ON e.manager_id = m.id WHERE d.id = ${response.department};`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    res.forEach((employee) => {
+                        console.log(
+                            `id: ${employee.id} || First Name: ${employee.first_name} || Last Name: ${employee.last_name} || Role: ${employee.role} || Manager: ${employee.managerFirstName}`
+                        )
+                    })
+                    findDept();
+                })  
+            })
+    })
+}
 
 const roleSearch = () => {
-    inquirer
-        .prompt({
-            name: '',
-            type: '',
-            message: ''
-        })
-};
+    const tableRole = 'SELECT title AS name, id AS value FROM role';
+    connection.query(tableRole, (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt({
+                name: 'role',
+                type: 'rawlist',
+                message: 'What role would you like to view?',
+                choices: res
+            })
+            .then((response) => {
+                const query = `SELECT role.title AS role, m.first_name AS managerFirstName, e.id, e.first_name, e.last_name FROM employee AS e LEFT JOIN role ON e.role_id = role.id LEFT JOIN employee AS m ON e.manager_id = m.id WHERE e.role_id = ${response.role}`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    res.forEach((employee) => {
+                        console.log(
+                            `id: ${employee.id} || First Name: ${employee.first_name} || Last Name: ${employee.last_name} || Role: ${employee.role} || Manager: ${employee.managerFirstName}`
+                        )
+                    })
+                    findDept();
+                })
+            })
+    })
+
+}
 
 const addEmp = () => {
     inquirer
         .prompt({
-            name: '',
+            name: 'first_name',
             type: '',
             message: ''
         })
@@ -109,7 +148,7 @@ const addEmp = () => {
 
 const addDept = () => {
     inquirer
-        .prompt( {
+        .prompt({
             name: '',
             type: '',
             message: ''

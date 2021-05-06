@@ -8,16 +8,20 @@ CREATE TABLE employee (
     first_name VARCHAR(30) NOT NULL,
     last_name VARCHAR(30) NULL,
     PRIMARY KEY (id),
+    role_id INT NOT NULL,
     FOREIGN KEY role_id REFERENCES role(id),
-    FOREIGN KEY manager_id REFERENCES role
+
+    manager_id INT NOT NULL,
+    FOREIGN KEY manager_id REFERENCES employee(id)
 );
 
 CREATE TABLE role (
     id INT NOT NULL AUTO_INCREMENT,
     title VARCHAR(30) NOT NULL,
     salary DECIMAL NULL,
-    FOREIGN KEY department_id REFERENCES department(id),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    department_id INT NOT NULL,
+    FOREIGN KEY department_id REFERENCES department(id) 
 );
 
 CREATE TABLE department (
@@ -30,10 +34,12 @@ SELECT * FROM employee;
 SELECT * FROM role;
 SELECT * FROM department;
 
-SELECT 'column_name(s)'
-FROM employee'table1'
-INNER JOIN role'table2'
-ON 'table1.column_name' = 'table2.column_name'
-INNER JOIN departmentShippers 
-ON Orders.ShipperID = Shippers.ShipperID);
+SELECT role.title 
+AS role, e.first_name 
+AS managerFirstName, id, first_name, last_name 
+FROM employee 
+LEFT JOIN role 
+ON employee.role_id = role.id 
+LEFT JOIN employee 
+AS e ON employee.manager_id = e.id;
 
