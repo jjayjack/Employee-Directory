@@ -105,7 +105,7 @@ const deptSearch = () => {
                         )
                     })
                     findDept();
-                })  
+                })
             })
     })
 }
@@ -138,28 +138,98 @@ const roleSearch = () => {
 }
 
 const addEmp = () => {
-    inquirer
-        .prompt({
-            name: 'first_name',
-            type: '',
-            message: ''
+    const query = 'SELECT title AS name, id AS value FROM role';
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        const query2 = `SELECT concat(first_name, ' ', last_name) AS name, id AS value FROM employee`;
+        connection.query(query2, (err2, res2) => {
+            if (err2) throw err2
+
+            inquirer
+                .prompt( [
+                    {
+                        name: 'first_name',
+                        type: 'input',
+                        message: 'What is the employee\'s first name?'
+                    },
+                    {
+                        name: 'last_name',
+                        type: 'input',
+                        message: 'What is the employee\'s last name?'
+                    },
+                    {
+                        name: 'role_id',
+                        type: 'rawlist',
+                        message: 'What is the employee\'s role?',
+                        choices: res
+                    },
+                    {
+                        name: 'manager_id',
+                        type: 'rawlist',
+                        message: 'Who is the manager of the employee',
+                        choices: res2
+                    }])
+                .then((response) => {
+                    const query3 = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ('${response.first_name}', '${response.last_name}', '${response.role_id}', '${response.manager_id}')`
+                    connection.query(query3, (err3, res3) => {
+                        if (err3) throw err3;
+                        findDept();
+                    })
+
+                }
+
+                )
+
         })
+    })
 };
 
 const addDept = () => {
     inquirer
         .prompt({
-            name: '',
-            type: '',
-            message: ''
+            name: 'name',
+            type: 'input',
+            message: 'What is the name of the department?'
+        })
+        .then((response) => {
+            const query4 = `INSERT INTO department (name) VALUES ('${response.name}')`
+            connection.query(query4, (err4, res4) => {
+                if (err4) throw err4;
+                findDept();
+            })
         })
 };
 
 const addRole = () => {
-    inquirer
-        .prompt({
-            name: '',
-            type: '',
-            message: ''
-        })
+    const query = 'SELECT name, id AS value FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        inquirer
+            .prompt([
+                {
+                    name: 'title',
+                    type: 'input',
+                    message: 'What is the new role?'
+                },
+                {
+                    name: 'newSalary',
+                    type: 'input',
+                    message: 'What is the salary for the role?'
+                },
+                {
+                    name: 'department_id',
+                    type: 'rawlist',
+                    message: 'What is the department for the role?',
+                    choices: res
+                }
+            ]
+            )
+            .then((response) => {
+                const query4 = `INSERT INTO role (title, salary, department_id) VALUES ('${response.title}', '${response.newSalary}','${response.department_id}')`
+                connection.query(query4, (err4, res4) => {
+                    if (err4) throw err4;
+                    findDept();
+                })
+            })
+    })
 };
