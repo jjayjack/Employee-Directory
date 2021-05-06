@@ -29,6 +29,7 @@ const findDept = () => {
                 'View All Employees',
                 'View All Employees By Department',
                 'View All Employees By Role',
+                'View All Employees By Manager',
                 'Add Employee',
                 'Add Department',
                 'Add Role',
@@ -44,11 +45,15 @@ const findDept = () => {
                     break;
 
                 case 'View All Employees By Department':
-                    deptSearch();
+                    deptView();
                     break;
 
                 case 'View All Employees By Role':
-                    roleSearch();
+                    roleView();
+                    break;
+
+                case 'View All Employees By Manager':
+                    manaView();
                     break;
 
                 case 'Add Employee':
@@ -70,6 +75,7 @@ const findDept = () => {
                 case 'Edit Manager':
                     editManager();
                     break;
+                
 
                 case 'Exit':
                     process.exit();
@@ -94,7 +100,7 @@ const empView = () => {
     })
 };
 
-const deptSearch = () => {
+const deptView = () => {
     const tableDept = 'SELECT name, id AS value FROM department';
     connection.query(tableDept, (err, res) => {
         if (err) throw err;
@@ -120,7 +126,7 @@ const deptSearch = () => {
     })
 }
 
-const roleSearch = () => {
+const roleView = () => {
     const tableRole = 'SELECT title AS name, id AS value FROM role';
     connection.query(tableRole, (err, res) => {
         if (err) throw err;
@@ -145,6 +151,33 @@ const roleSearch = () => {
             })
     })
 
+}
+
+const manaView = () => {
+    const tableMana = `SELECT concat(first_name, ' ', last_name) AS name, id AS value FROM employee`;
+    connection.query(tableMana, (err, res) => {
+        if (err) throw err;
+        inquirer
+            .prompt({
+                name: 'manager_id',
+                type: 'rawlist',
+                message: 'What manager would you like to view?',
+                choices: res
+            })
+
+            .then((response) => {
+                const query = `SELECT role.title AS role, m.first_name AS managerFirstName, e.id, e.first_name, e.last_name FROM employee AS e LEFT JOIN role ON e.role_id = role.id LEFT JOIN employee AS m ON e.manager_id = m.id WHERE e.manager_id = ${response.manager_id}`;
+                connection.query(query, (err, res) => {
+                    if (err) throw err;
+                    res.forEach((employee) => {
+                        console.log(
+                            `id: ${employee.id} || First Name: ${employee.first_name} || Last Name: ${employee.last_name} || Role: ${employee.role} || Manager: ${employee.managerFirstName}`
+                        )
+                    })
+                    findDept();
+                })
+            })
+    })
 }
 
 const addEmp = () => {
