@@ -32,6 +32,7 @@ const findDept = () => {
                 'Add Employee',
                 'Add Department',
                 'Add Role',
+                'Edit Role',
                 'Exit'
             ],
         })
@@ -60,6 +61,10 @@ const findDept = () => {
                 case 'Add Role':
                     addRole();
                     break;
+                
+                case 'Edit Role':
+                    editRole();
+                    break;                
 
                 case 'Exit':
                     process.exit();
@@ -209,7 +214,7 @@ const addRole = () => {
                 {
                     name: 'title',
                     type: 'input',
-                    message: 'What is the new role?'
+                    message: 'What is the new title?'
                 },
                 {
                     name: 'newSalary',
@@ -233,3 +238,37 @@ const addRole = () => {
             })
     })
 };
+
+const editRole = () => {
+    const query = `SELECT concat(first_name, ' ', last_name) AS name, id AS value FROM employee`;
+    connection.query(query, (err, res) => {
+        if (err) throw err
+        const query2 = 'SELECT title AS name, id AS value FROM role';
+        connection.query(query2, (err2, res2) => {
+            if (err2) throw err2
+
+            inquirer
+                .prompt([
+                    {
+                        name: 'first_name',
+                        type: 'rawlist',
+                        message: 'Which employee would you like to update?',
+                        choices: res
+                    },
+                    {
+                        name: 'title',
+                        type: 'rawlist',
+                        message: 'What is the employee\'s new title?',
+                        choices: res2
+                    }
+                ])
+                .then((response) => {
+                    const query3 = `UPDATE employee SET role_id = ${response.title} WHERE id = ${response.first_name}`
+                    connection.query(query3, (err3, res3) => {
+                        if (err3) throw err3;
+                        findDept();
+                    })
+                })
+        })
+    })
+}
