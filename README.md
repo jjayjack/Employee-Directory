@@ -8,6 +8,7 @@ To create this application, SQL, Inquirer and Console Table were used to create 
 
 ## Demo
 Link to video: https://drive.google.com/file/d/1xZf1ARtuJz2wyr6Jgy-7n0TUCmrY-rLL/view?usp=sharing
+
 Starting application from command line
 ![OlrMw0hKem](https://user-images.githubusercontent.com/79474830/117242967-ed073080-adfb-11eb-9fe1-8df0409c2466.gif)
 
